@@ -1,4 +1,5 @@
 import unittest
+# import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -11,7 +12,35 @@ class StreamTVTest(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.get('http://streamtv.net.ua/base/')
-        self.streamtv_login()
+        self.streamtv_login(login='auto', password='test')
+        self.new_wrestler('SomeName', 'SomeMiddleName', 'MyLastName',
+                          '01.02.1988', 'Sumska', 'Dinamo', 'FW', 'Senior',
+                          '2017', 'Produced')
+        self.update_wrestler(first_name='Update name')
+
+    def update_wrestler(self, **kwargs):
+        """
+
+        Args: first_name
+
+        """
+        if 'first_name' in kwargs:
+            self.update_first_name = kwargs['first_name']
+        else:
+            self.update_first_name = ''
+
+    def new_wrestler(self, first_name, middle_name, last_name, birth_date,
+                     dd_region, dd_fst, dd_style, dd_age, dd_year, dd_status):
+        self.first_name = first_name
+        self.middle_name = middle_name
+        self.last_name = last_name
+        self.birth_date = birth_date
+        self.dd_region = dd_region
+        self.dd_fst = dd_fst
+        self.dd_style = dd_style
+        self.dd_age = dd_age
+        self.dd_year = dd_year
+        self.dd_status = dd_status
 
     def test_create(self):
         """
@@ -35,46 +64,46 @@ class StreamTVTest(unittest.TestCase):
             EC.presence_of_element_located((
                 By.XPATH, "//fg-input[@label='Last name']/div/input"))
         )
-        input_text.send_keys('MyLastName')
+        input_text.send_keys(self.last_name)
         # First Name
         input_text = self.driver.find_element_by_xpath(
             "//fg-input[@label='First name']/div/input")
-        input_text.send_keys('SomeName')
+        input_text.send_keys(self.first_name)
         # Middle Name
         input_text = self.driver.find_element_by_xpath(
             "//fg-input[@label='Middle name']/div/input")
-        input_text.send_keys('SomeMiddleName')
+        input_text.send_keys(self.middle_name)
         # Date of birth
         input_text = self.driver.find_element_by_xpath(
             "//fg-date[@label='Date of Birth']/div/input")
-        input_text.send_keys('01.02.1988')
+        input_text.send_keys(self.birth_date)
         # endregion
 
         # region drop-downs
         # Region select
         select = Select(self.driver.find_element_by_xpath(
             "//fg-select[@label='Region']/div/select"))
-        select.select_by_visible_text('Sumska')
+        select.select_by_visible_text(self.dd_region)
         # FST select
         select = Select(self.driver.find_element_by_xpath(
             "//fg-select[@label='FST']/div/select"))
-        select.select_by_visible_text('Dinamo')
+        select.select_by_visible_text(self.dd_fst)
         # Style select
         select = Select(self.driver.find_element_by_xpath(
             "//fg-select[@label='Style']/div/select"))
-        select.select_by_visible_text('FW')
+        select.select_by_visible_text(self.dd_style)
         # Age select
         select = Select(self.driver.find_element_by_xpath(
             "//fg-select[@label='Age']/div/select"))
-        select.select_by_visible_text('Senior')
+        select.select_by_visible_text(self.dd_age)
         # Year select
         select = Select(self.driver.find_element_by_xpath(
             "//fg-select[@label='Year']/div/select"))
-        select.select_by_visible_text('2017')
+        select.select_by_visible_text(self.dd_year)
         # Status select
         select = Select(self.driver.find_element_by_xpath(
             "//f-select[@label='Status']/select"))
-        select.select_by_visible_text('Produced')
+        select.select_by_visible_text(self.dd_status)
         # endregion
 
         # Button save
@@ -111,12 +140,14 @@ class StreamTVTest(unittest.TestCase):
         )
         rows = table.find_elements(By.TAG_NAME, "tr")
         rows[0].click()
-        input_text = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((
-                By.XPATH, "//fg-input[@label='First name']/div/input"))
-        )
-        input_text.clear()
-        input_text.send_keys('Update Name')
+        if self.update_first_name != '':
+            input_text = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((
+                    By.XPATH, "//fg-input[@label='First name']/div/input"))
+            )
+            input_text.clear()
+            input_text.send_keys(self.update_first_name)
+
         # Button save
         btn_save = self.driver.find_element_by_css_selector(
             'button.btn-success')
@@ -209,15 +240,17 @@ class StreamTVTest(unittest.TestCase):
                 break
         btn_close.click()
 
-    def streamtv_login(self):
+    def streamtv_login(self, login='', password=''):
         login_name = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR,
                                             '#username>div>input'))
         )
-        login_name.send_keys('auto')
+        if login == '' or password == '':
+            assert 0
+        login_name.send_keys(login)
         login_pass = self.driver.find_element_by_xpath(
             "//input[@type='password']")
-        login_pass.send_keys('test')
+        login_pass.send_keys(password)
         btn_submit = self.driver.find_element_by_xpath(
             "//button[@type='submit']")
         btn_submit.click()
