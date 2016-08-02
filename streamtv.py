@@ -30,7 +30,8 @@ class StreamTVTest(unittest.TestCase):
             self.update_first_name = ''
 
     def new_wrestler(self, first_name, middle_name, last_name, birth_date,
-                     dd_region, dd_fst, dd_style, dd_age, dd_year, dd_status):
+                     dd_region, dd_fst, dd_style, dd_age, dd_year, dd_status,
+                     trainer=''):
         self.first_name = first_name
         self.middle_name = middle_name
         self.last_name = last_name
@@ -41,6 +42,7 @@ class StreamTVTest(unittest.TestCase):
         self.dd_age = dd_age
         self.dd_year = dd_year
         self.dd_status = dd_status
+        self.trainer = trainer
 
     def test_create(self):
         """
@@ -77,6 +79,10 @@ class StreamTVTest(unittest.TestCase):
         input_text = self.driver.find_element_by_xpath(
             "//fg-date[@label='Date of Birth']/div/input")
         input_text.send_keys(self.birth_date)
+        # Trainer (not required)
+        if self.trainer != '':
+            pass
+            # TODO select element trainer and write new trainer value
         # endregion
 
         # region drop-downs
